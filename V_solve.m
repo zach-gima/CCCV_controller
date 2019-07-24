@@ -3,20 +3,22 @@
 % the fsolve function based on a desired input current
 % By: Zach Gima 2019-7-12
 
-function V_out = V_solve(V, x, V_ref, Kp, capacity, C_rate)
+function V_out = V_solve(V, x, V_ref, Kp, capacity, C_rate,Int,dt)
     run param/params_NCA_simulink
     
     % Compute control law current, but regulate if above max charge rate
-    I_chrgmax = -capacity*C_rate/1000; %A
-    I_ctrl = Kp*(V-V_ref);
-    
-    if I_ctrl < I_chrgmax % charging current is negative, so higher charging rate is a more negative value
-        scale_Kp = I_chrgmax/I_ctrl; % bound the max current; here use max instead of min because charge current is (-)
-        % recompute Kp if         
-        cur = scale_Kp*Kp*(V-V_ref);
-    else % case where charging current from controller doesn't exceed max rate
-        cur = I_ctrl;
-    end
+%     I_chrgmax = -capacity*C_rate/1000; %A
+%     I_ctrl = Kp*(V-V_ref);
+%     
+%     if I_ctrl < I_chrgmax % charging current is negative, so higher charging rate is a more negative value
+%         scale_Kp = I_chrgmax/I_ctrl; % bound the max current; here use max instead of min because charge current is (-)
+%         % recompute Kp if         
+%         cur = scale_Kp*Kp*(V-V_ref);
+%     else % case where charging current from controller doesn't exceed max rate
+%         cur = I_ctrl;
+%     end
+
+    [cur,~] = current_ctrl_fcn(V,V_ref,Kp,C_rate,capacity,dt,Int);
 
     % Parse states
     c_s_n = x(1:(p.Nr-1));
